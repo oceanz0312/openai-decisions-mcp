@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Amp orb setup for openai-decisions-mcp, the primary repository of the Amp "Decisions" project.
+#
+# In project orbs the additional repository (openai-decisions-browser) is checked out under
+# ../repos/openai-decisions-browser; this script installs and builds both. When openai-decisions-mcp is
+# cloned standalone (no sibling openai-decisions-browser checkout), the browser repo is
+# skipped and only openai-decisions-mcp is prepared.
+#
+# The script is idempotent: safe to run repeatedly; warm runs converge fast.
+set -euo pipefail
+
+log() { printf '[decisions setup %s] %s\n' "$(date -u +%H:%M:%S)" "$*"; }
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$root"
+
+# Locate the openai-decisions-browser checkout (Amp multi-repo projects use ../repos/).
+browser=""
+for candidate in "$root/../repos/openai-decisions-browser" "$root/../openai-decisions-browser"; do
+  if [ -f "$candidate/package.json" ]; then
+    browser="$(cd "$candidate" && pwd)"
+    break
+  fi
+done
+
+# openai-decisions-mcp requires Node >= 22.
+node_version="$(node --version 2>/dev/null || true)"
+node_major="$(printf '%s' "$node_version" | sed 's/^v\([0-9]*\).*/\1/')"
+if [ "${node_major:-0}" -lt 22 ]; then
+  log "ERROR: Node >= 22 required, found: ${node_version:-none}"
+  exit 1
+fi
+
+log "installing openai-decisions-mcp dependencies"
+npm ci --no-fund --no-audit
+
+log "building openai-decisions-mcp"
+npm run build
+
+if [ -n "$browser" ]; then
+  log "installing openai-decisions-browser dependencies at $browser (first run downloads Chromium)"
+  (cd "$browser" && npm ci --no-fund --no-audit)
+  log "building openai-decisions-browser"
+  (cd "$browser" && npm run build)
+else
+  log "no openai-decisions-browser checkout found; skipped (standalone openai-decisions-mcp setup)"
+fi
+
+log "done"

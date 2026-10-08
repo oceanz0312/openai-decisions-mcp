@@ -1,0 +1,64 @@
+{
+  "name": "openai-decisions-mcp",
+  "version": "0.1.0",
+  "description": "MCP server exposing OpenAI Decisions as purpose-built judgment tools with typed probabilities.",
+  "type": "module",
+  "license": "MIT",
+  "author": "OpenAI Decisions MCP contributors",
+  "contributors": ["Joey Kudish (original jev-mcp architecture)"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oceanz0312/openai-decisions-mcp.git"
+  },
+  "homepage": "https://github.com/oceanz0312/openai-decisions-mcp#readme",
+  "bugs": { "url": "https://github.com/oceanz0312/openai-decisions-mcp/issues" },
+  "bin": {
+    "openai-decisions-mcp": "dist/index.js"
+  },
+  "exports": {
+    ".": "./dist/server.js",
+    "./server": "./dist/server.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "NOTICE.md",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "skills"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/unit.test.mjs test/provider.test.mjs test/http.test.mjs test/exa-example.test.mjs test/server.test.mjs test/hook-gate.test.mjs test/openai-e2e.test.mjs",
+    "test:e2e": "node --test test/openai-e2e.test.mjs"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "openai",
+    "decisions-api",
+    "ai",
+    "verification",
+    "guardrails",
+    "semantic-search"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/node": "^2.1.1",
+    "@modelcontextprotocol/server": "^2.3.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "^2.3.1",
+    "@types/node": "^22.0.0",
+    "typescript": "^7.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
